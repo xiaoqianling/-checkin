@@ -3,33 +3,36 @@ name: Auto Checkin Job
 on:
   schedule:
     # 每天早上 6 点北京时间（UTC+8）运行
-    - cron: '0 22 * * *'  # UTC 时间 22:00 对应北京时间 6:00
-  workflow_dispatch:  # 允许手动触发
+    - cron: "0 22 * * *" # UTC 时间 22:00 对应北京时间 6:00
+  workflow_dispatch: # 允许手动触发
 
 jobs:
   auto-sign:
-    runs-on: ubuntu-latest  # 使用最新的 Ubuntu 环境
+    runs-on: ubuntu-latest # 使用最新的 Ubuntu 环境
 
     steps:
       # 1. 检出代码
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # 2. 设置 Python 环境
-      - name: Set up Python
-        uses: actions/setup-python@v4
+      # 2. 设置 Node.js 环境
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
         with:
-          python-version: '3.10'  # 指定 Python 版本
+          node-version: "18" # 指定 Node.js 版本
+          cache: "npm"
 
       # 3. 安装依赖
       - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt  # 如果有依赖文件
+        run: npm ci
 
-      # 4. 运行脚本并捕获输出
+      # 4. 构建TypeScript项目
+      - name: Build TypeScript
+        run: npm run build
+
+      # 5. 运行脚本并捕获输出
       - name: Run auto checkin script
-        id: run_script  # 给步骤命名，方便后续引用输出
+        id: run_script # 给步骤命名，方便后续引用输出
         continue-on-error: true
         env:
           TOKEN: ${{ secrets.TOKEN }}
@@ -38,4 +41,4 @@ jobs:
           BARK_SERVER_URL: ${{ secrets.BARK_SERVER_URL }}
           SERVER3_SEND_KEY: ${{ secrets.SERVER3_SEND_KEY }} # ServerChan3
         run: |
-          python auto_checkin.py
+          npm start
