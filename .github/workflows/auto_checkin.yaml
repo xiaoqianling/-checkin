@@ -26,11 +26,7 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      # 4. 构建TypeScript项目
-      - name: Build TypeScript
-        run: npm run build
-
-      # 5. 运行脚本并捕获输出
+      # 4. 运行TypeScript脚本并捕获输出
       - name: Run auto checkin script
         id: run_script # 给步骤命名，方便后续引用输出
         continue-on-error: true
@@ -41,4 +37,4 @@ jobs:
           BARK_SERVER_URL: ${{ secrets.BARK_SERVER_URL }}
           SERVER3_SEND_KEY: ${{ secrets.SERVER3_SEND_KEY }} # ServerChan3
         run: |
-          npm start
+          npm run dev
